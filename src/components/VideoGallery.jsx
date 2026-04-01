@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, X, ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useSite } from '../context/SiteContext';
 import './VideoGallery.css';
 
 const VideoGallery = () => {
+  const { settings } = useSite();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(null);

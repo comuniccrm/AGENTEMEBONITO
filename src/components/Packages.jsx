@@ -152,6 +152,7 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    loading="lazy"
                   />
                 </AnimatePresence>
 
@@ -275,7 +276,7 @@ const AllToursView = ({ packages, onBack, onPackageClick }) => {
 
 // Componente Principal
 const Packages = () => {
-  const { toggleCartItem, isSelected } = useSite();
+  const { settings, toggleCartItem, isSelected } = useSite();
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAllTours, setShowAllTours] = useState(false);
