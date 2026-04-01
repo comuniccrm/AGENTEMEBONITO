@@ -87,7 +87,7 @@ const PostDetail = () => {
           </Link>
 
           <header style={{ marginBottom: '3rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '2rem' }}>
-            <p style={{ fontSize: '1.4rem', color: '#475569', lineHeight: '1.6', fontWeight: '400', marginBottom: '2rem' }}>
+            <p style={{ fontSize: '1.4rem', color: '#475569', lineHeight: '1.6', fontWeight: '400', marginBottom: '2rem', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
               {post.excerpt}
             </p>
             
@@ -122,7 +122,9 @@ const PostDetail = () => {
               fontSize: '1.25rem', 
               lineHeight: '1.9', 
               marginBottom: '4rem',
-              fontWeight: '400'
+              fontWeight: '400',
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word'
             }}
             dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
           />
