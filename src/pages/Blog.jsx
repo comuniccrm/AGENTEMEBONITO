@@ -96,10 +96,10 @@ const Blog = () => {
                     <div style={{ padding: '2rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
                       <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1rem' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <Calendar size={14} /> {new Date(post.created_at).toLocaleDateString('pt-BR')}
+                          <Calendar size={14} /> {new Date(post.published_at || post.created_at).toLocaleDateString('pt-BR')}
                         </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <User size={14} /> Equipe Bonito
+                          <User size={14} /> {post.author || 'Equipe Bonito'}
                         </span>
                       </div>
 

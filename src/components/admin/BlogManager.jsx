@@ -16,6 +16,8 @@ const BlogManager = () => {
     content: '',
     image_url: '',
     category: 'Dicas',
+    author: 'Equipe Bonito',
+    published_at: new Date().toISOString().slice(0, 16),
     meta_title: '',
     meta_description: ''
   });
@@ -64,7 +66,10 @@ const BlogManager = () => {
 
   const openModal = (post = null) => {
     if (post) {
-      setFormData(post);
+      setFormData({
+        ...post,
+        published_at: post.published_at ? new Date(post.published_at).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16)
+      });
       setEditingId(post.id);
     } else {
       setFormData({
@@ -74,6 +79,8 @@ const BlogManager = () => {
         content: '',
         image_url: '',
         category: 'Dicas',
+        author: 'Equipe Bonito',
+        published_at: new Date().toISOString().slice(0, 16),
         meta_title: '',
         meta_description: ''
       });
@@ -120,17 +127,21 @@ const BlogManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const dbPayload = {
+        ...formData,
+        published_at: new Date(formData.published_at).toISOString() // Convert back to ISO for DB
+      };
       if (editingId) {
         const { error } = await supabase
           .from('posts')
-          .update(formData)
+          .update(dbPayload)
           .eq('id', editingId);
         if (error) throw error;
         toast.success('Post atualizado!');
       } else {
         const { error } = await supabase
           .from('posts')
-          .insert([formData]);
+          .insert([dbPayload]);
         if (error) throw error;
         toast.success('Post criado!');
       }
@@ -187,7 +198,10 @@ const BlogManager = () => {
                   <td style={{ padding: '1rem' }}>
                     <img src={post.image_url || 'https://via.placeholder.com/150'} alt={post.title} style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
                   </td>
-                  <td style={{ padding: '1rem', fontWeight: '600' }}>{post.title}</td>
+                  <td style={{ padding: '1rem', fontWeight: '600' }}>
+                    {post.title}
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal', marginTop: '0.2rem' }}>Por {post.author || 'Equipe Bonito'}</div>
+                  </td>
                   <td style={{ padding: '1rem' }}>{post.category}</td>
                   <td style={{ padding: '1rem', fontSize: '0.8rem', color: '#64748b' }}>/blog/{post.slug}</td>
                   <td style={{ padding: '1rem', textAlign: 'right' }}>
@@ -230,6 +244,17 @@ const BlogManager = () => {
                     <option value="Roteiros">Roteiros</option>
                     <option value="Geral">Geral</option>
                   </select>
+                </div>
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Autor da Matéria</label>
+                  <input required className="form-input" value={formData.author} onChange={(e) => setFormData({...formData, author: e.target.value})} placeholder="Nome do autor..." />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label>Data/Hora da Publicação</label>
+                  <input required type="datetime-local" className="form-input" value={formData.published_at} onChange={(e) => setFormData({...formData, published_at: e.target.value})} />
                 </div>
               </div>
 
