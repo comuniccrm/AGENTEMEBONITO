@@ -141,9 +141,9 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
             onClick={(e) => e.stopPropagation()}
             style={{ width: '100%', maxWidth: '1000px', maxHeight: '95vh', overflowY: 'auto', background: 'var(--color-bg-dark)', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.1)', padding: 0, display: 'flex', flexDirection: 'column' }}
           >
-            <div className="modal-inner-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1.2fr) 1fr', minHeight: '600px' }}>
+            <div className="modal-inner-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1.2fr) 1fr' }}>
               {/* Photo Area */}
-              <div style={{ position: 'relative', background: '#000', height: '100%', minHeight: '400px' }}>
+              <div className="modal-photo-area" style={{ position: 'relative', background: '#000', height: '100%', minHeight: '400px' }}>
                 <AnimatePresence mode="wait">
                   <motion.img 
                     key={activeImage}
@@ -178,11 +178,11 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
               </div>
 
               {/* Info Area */}
-              <div style={{ padding: '3rem', display: 'flex', flexDirection: 'column', color: 'white' }}>
+              <div className="modal-info-area" style={{ padding: '3rem', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)' }}>
                 <span className="text-gradient" style={{ fontWeight: '700', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>{pkg.category}</span>
                 <h2 style={{ fontSize: '2.5rem', fontWeight: '900', margin: '1rem 0', lineHeight: '1.1' }}>{pkg.name}</h2>
                 
-                <div style={{ display: 'flex', gap: '2rem', margin: '1.5rem 0', color: 'var(--text-secondary)' }}>
+                <div className="modal-meta" style={{ display: 'flex', gap: '2rem', margin: '1.5rem 0', color: 'var(--text-secondary)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Clock size={18} /> {pkg.duration || '02:00h'}
                   </div>
@@ -191,25 +191,26 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
                   </div>
                 </div>
 
-                <div style={{ flex: 1 }}>
+                <div className="modal-desc-area" style={{ flex: 1 }}>
                   <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '2rem 0 1rem 0', color: 'var(--color-primary)' }}><Info size={18} /> Detalhes da Experiência</h4>
                   <p style={{ color: 'var(--text-secondary)', lineHeight: '1.8', fontSize: '1.1rem' }}>
                     {pkg.long_description || pkg.description}
                   </p>
                 </div>
 
-                <div style={{ marginTop: '3rem', background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <div>
+                <div className="modal-action-bar" style={{ marginTop: '3rem', background: 'var(--color-bg-darker)', padding: '2rem', borderRadius: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', border: '1px solid var(--color-border)' }}>
+                  <div className="modal-price-container">
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>Valor Oficial:</span>
-                    <div style={{ fontSize: '2rem', fontWeight: '900', color: 'white' }}>R$ {pkg.price}</div>
+                    <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--text-primary)' }}>R$ {pkg.price}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: '1rem' }}>
+                  <div className="modal-buttons-container" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                     <Button 
                       variant="outline" 
                       onClick={() => toggleCartItem(pkg)}
                       style={{ 
-                        borderColor: isSelected(pkg.id) ? 'var(--color-primary)' : 'white',
-                        color: isSelected(pkg.id) ? 'var(--color-primary)' : 'white'
+                        borderColor: 'var(--color-primary)',
+                        color: 'var(--color-primary)',
+                        background: isSelected(pkg.id) ? 'var(--color-primary-glow)' : 'transparent'
                       }}
                     >
                       {isSelected(pkg.id) ? 'Remover da Lista' : 'Selecionar Passeio'}
@@ -219,6 +220,8 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
                     </Button>
                   </div>
                 </div>
+                {/* Spacer block to ensure scrollable modal doesn't clip the bottom radius */}
+                <div style={{ paddingBottom: '2rem' }} />
               </div>
             </div>
           </motion.div>
@@ -283,10 +286,15 @@ const Packages = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [width, setWidth] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const carousel = React.useRef();
 
   useEffect(() => {
     fetchPackages();
+    
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -317,7 +325,11 @@ const Packages = () => {
     setIsModalOpen(true);
   };
 
-  if (loading) return <div className="packages-loading">Carregando passeios...</div>;
+  if (loading) return (
+    <div style={{ padding: '8rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '40px', height: '40px', border: '3px solid rgba(0,0,0,0.05)', borderTop: '3px solid var(--color-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+    </div>
+  );
 
   if (showAllTours) {
     return (
@@ -366,7 +378,7 @@ const Packages = () => {
                   x: {
                     repeat: Infinity,
                     repeatType: "loop",
-                    duration: 45, // Increased from 25 to 45 for a smoother experience
+                    duration: isMobile ? 120 : 45, // Slower on mobile
                     ease: "linear",
                   },
                 }}
