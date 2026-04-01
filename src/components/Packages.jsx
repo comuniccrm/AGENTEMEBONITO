@@ -366,7 +366,7 @@ const Packages = () => {
                   x: {
                     repeat: Infinity,
                     repeatType: "loop",
-                    duration: 25, 
+                    duration: 45, // Increased from 25 to 45 for a smoother experience
                     ease: "linear",
                   },
                 }}
