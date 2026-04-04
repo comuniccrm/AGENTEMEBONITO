@@ -459,11 +459,25 @@ export default function CircularGallery({
   scrollEase = 0.05
 }) {
   const containerRef = useRef(null);
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
+    if (isMobile) return;
     const app = new App(containerRef.current, { items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase });
     return () => {
       app.destroy();
     };
-  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
+  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase, isMobile]);
+
+  if (isMobile) return null; // Or a simpler fallback gallery if needed
+
   return <div className="circular-gallery" ref={containerRef} />;
 }
+
+

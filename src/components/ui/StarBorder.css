@@ -10,14 +10,17 @@
 .border-gradient-bottom,
 .border-gradient-top {
   position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
+  width: 150%; /* Reduced from 200% */
+  height: 150%; /* Reduced from 200% */
+  top: -25%;
+  left: -25%;
   z-index: -1;
   animation: star-movement linear infinite;
   opacity: 1;
+  will-change: transform;
+  pointer-events: none;
 }
+
 
 .border-gradient-top {
   animation-direction: reverse;

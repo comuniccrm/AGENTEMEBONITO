@@ -12,10 +12,12 @@
 .blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
-  animation: move-blobs 20s infinite alternate;
+  filter: blur(60px); /* Reduced from 80px */
+  opacity: 0.12;
+  animation: move-blobs 20s infinite alternate linear;
+  will-change: transform;
 }
+
 
 .blob-1 {
   width: 500px;

@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+
 import { ArrowLeft, Search, Star, X, ChevronLeft, ChevronRight, Clock, Compass, Info } from 'lucide-react';
 import Button from './Button';
 import StarBorder from './ui/StarBorder';
@@ -118,11 +120,22 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
     setActiveImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!pkg) return null;
 
   const whatsappLink = `https://wa.me/${settings.whatsapp_number}?text=Olá! Gostaria de mais informações sobre o passeio: ${pkg.name}.`;
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div 
@@ -131,7 +144,6 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
           exit={{ opacity: 0 }}
           className="modal-overlay"
           onClick={onClose}
-          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
         >
           <motion.div 
             initial={{ scale: 0.9, y: 50, opacity: 0 }}
@@ -139,11 +151,11 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
             exit={{ scale: 0.9, y: 50, opacity: 0 }}
             className="modal-content glass"
             onClick={(e) => e.stopPropagation()}
-            style={{ width: '100%', maxWidth: '1000px', maxHeight: '95vh', overflowY: 'auto', background: 'var(--color-bg-dark)', borderRadius: '32px', border: '1px solid rgba(255,255,255,0.1)', padding: 0, display: 'flex', flexDirection: 'column' }}
           >
-            <div className="modal-inner-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1.2fr) 1fr' }}>
+            <div className="modal-inner-grid">
+
               {/* Photo Area */}
-              <div className="modal-photo-area" style={{ position: 'relative', background: '#000', height: '100%', minHeight: '400px' }}>
+              <div className="modal-photo-area">
                 <AnimatePresence mode="wait">
                   <motion.img 
                     key={activeImage}
@@ -151,26 +163,26 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    className="modal-main-image"
                     loading="lazy"
                   />
                 </AnimatePresence>
 
-                <button onClick={onClose} style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', background: 'white', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, cursor: 'pointer', boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
+                <button onClick={onClose} className="modal-close-btn">
                   <X size={20} color="#1e293b" />
                 </button>
 
                 {images.length > 1 && (
                   <>
-                    <button onClick={handlePrev} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                    <button onClick={handlePrev} className="modal-nav-btn prev">
                       <ChevronLeft size={24} />
                     </button>
-                    <button onClick={handleNext} style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                    <button onClick={handleNext} className="modal-nav-btn next">
                       <ChevronRight size={24} />
                     </button>
-                    <div style={{ position: 'absolute', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.5rem' }}>
+                    <div className="modal-dots">
                       {images.map((_, i) => (
-                        <div key={i} style={{ width: i === activeImage ? '24px' : '8px', height: '8px', background: 'white', borderRadius: '4px', transition: 'width 0.3s ease' }} />
+                        <div key={i} className={`modal-dot ${i === activeImage ? 'active' : ''}`} />
                       ))}
                     </div>
                   </>
@@ -178,40 +190,36 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
               </div>
 
               {/* Info Area */}
-              <div className="modal-info-area" style={{ padding: '3rem', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)' }}>
-                <span className="text-gradient" style={{ fontWeight: '700', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.9rem' }}>{pkg.category}</span>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: '900', margin: '1rem 0', lineHeight: '1.1' }}>{pkg.name}</h2>
+              <div className="modal-info-area">
+                <span className="text-gradient modal-category">{pkg.category}</span>
+                <h2 className="modal-title-text">{pkg.name}</h2>
                 
-                <div className="modal-meta" style={{ display: 'flex', gap: '2rem', margin: '1.5rem 0', color: 'var(--text-secondary)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div className="modal-meta">
+                  <div className="meta-item">
                     <Clock size={18} /> {pkg.duration || '02:00h'}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div className="meta-item">
                     <Compass size={18} /> Moderado
                   </div>
                 </div>
 
-                <div className="modal-desc-area" style={{ flex: 1 }}>
-                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '2rem 0 1rem 0', color: 'var(--color-primary)' }}><Info size={18} /> Detalhes da Experiência</h4>
-                  <p style={{ color: 'var(--text-secondary)', lineHeight: '1.8', fontSize: '1.1rem' }}>
+                <div className="modal-desc-area">
+                  <h4 className="modal-section-subtitle"><Info size={18} /> Detalhes da Experiência</h4>
+                  <p className="modal-description-text">
                     {pkg.long_description || pkg.description}
                   </p>
                 </div>
 
-                <div className="modal-action-bar" style={{ marginTop: '3rem', background: 'var(--color-bg-darker)', padding: '2rem', borderRadius: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem', border: '1px solid var(--color-border)' }}>
+                <div className="modal-action-bar">
                   <div className="modal-price-container">
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>Valor Oficial:</span>
-                    <div style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--text-primary)' }}>R$ {pkg.price}</div>
+                    <span className="price-label">Valor Oficial:</span>
+                    <div className="price-value-large">R$ {pkg.price}</div>
                   </div>
-                  <div className="modal-buttons-container" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div className="modal-buttons-container">
                     <Button 
                       variant="outline" 
                       onClick={() => toggleCartItem(pkg)}
-                      style={{ 
-                        borderColor: 'var(--color-primary)',
-                        color: 'var(--color-primary)',
-                        background: isSelected(pkg.id) ? 'var(--color-primary-glow)' : 'transparent'
-                      }}
+                      className={isSelected(pkg.id) ? 'is-selected' : ''}
                     >
                       {isSelected(pkg.id) ? 'Remover da Lista' : 'Selecionar Passeio'}
                     </Button>
@@ -220,16 +228,18 @@ const PackageDetailModal = ({ pkg, isOpen, onClose }) => {
                     </Button>
                   </div>
                 </div>
-                {/* Spacer block to ensure scrollable modal doesn't clip the bottom radius */}
-                <div style={{ paddingBottom: '2rem' }} />
+                <div className="modal-bottom-spacer" />
               </div>
+
             </div>
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
+
 
 // Componente da Tela Completa (Filtros)
 const AllToursView = ({ packages, onBack, onPackageClick }) => {
@@ -370,36 +380,15 @@ const Packages = () => {
         {packages.length > 0 ? (
           <>
             <div className="carousel-container">
-              <motion.div 
+              <div 
                 ref={carousel}
                 className="carousel-track"
-                animate={{ x: [0, -width] }}
-                transition={{
-                  x: {
-                    repeat: Infinity,
-                    repeatType: "loop",
-                    duration: isMobile ? 120 : 45, // Slower on mobile
-                    ease: "linear",
-                  },
-                }}
-                whileHover={{ animationPlayState: 'paused' }}
                 style={{ display: 'flex' }}
               >
                 {marqueeTours.map((pkg, index) => (
-                  <motion.div 
+                  <div 
                     className="carousel-item" 
                     key={`${pkg.id}-${index}`}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    animate={{ 
-                      y: [0, -8, 0],
-                    }}
-                    transition={{
-                      y: {
-                        duration: 4 + (index % 3),
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }
-                    }}
                   >
                     <TourCard 
                       pkg={pkg} 
@@ -407,9 +396,10 @@ const Packages = () => {
                       isSelected={isSelected(pkg.id)}
                       onToggleSelect={toggleCartItem}
                     />
-                  </motion.div>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
+
             </div>
 
             <div className="carousel-footer" style={{ display: 'none' }}>
@@ -432,4 +422,3 @@ const Packages = () => {
 };
 
 export default Packages;
-

@@ -1,14 +1,15 @@
 import React, { Suspense, lazy } from 'react';
 import Navigation from '../components/Navigation';
 import Hero from '../components/Hero';
-import Packages from '../components/Packages';
 import PureGlassBackground from '../components/PureGlassBackground';
-import FluidGallery from '../components/FluidGallery';
 import Footer from '../components/Footer';
 
+const Packages = lazy(() => import('../components/Packages'));
+const FluidGallery = lazy(() => import('../components/FluidGallery'));
 const VideoGallery = lazy(() => import('../components/VideoGallery'));
 const AboutSection = lazy(() => import('../components/AboutSection'));
 const TransportSection = lazy(() => import('../components/TransportSection'));
+
 import { useSite } from '../context/SiteContext';
 
 function Home() {
@@ -21,7 +22,9 @@ function Home() {
       <main style={{ position: 'relative', zIndex: 1 }}>
         <Hero />
         
-        <Packages />
+        <Suspense fallback={<div style={{ height: '600px' }} />}>
+          <Packages />
+        </Suspense>
         
         <Suspense fallback={<div style={{ height: '400px' }} />}>
           <VideoGallery />
@@ -37,7 +40,9 @@ function Home() {
             </p>
           </div>
           
-          <FluidGallery />
+          <Suspense fallback={<div style={{ height: '500px' }} />}>
+            <FluidGallery />
+          </Suspense>
         </section>
         
         <Suspense fallback={<div style={{ height: '400px' }} />}>
@@ -50,5 +55,6 @@ function Home() {
     </div>
   );
 }
+
 
 export default Home;
